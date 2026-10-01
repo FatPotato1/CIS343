@@ -1,4 +1,4 @@
-Lab 1 Report
+Lab 1 Report:
 
 Language name: still thinking about one, but I will use "Spaghetti" for now
 
