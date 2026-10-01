@@ -1,29 +1,38 @@
 import sys
+from scanner import Scanner
 
-def repl():
-    print("REPL mode")
-    while True:
-        try:
-            input("> ")
-            print("Scanner Not Implemented")
+class Lox:
+    def repl(self):
+        print("REPL mode")
+        while True:
+            try:
+                source = input("> ")
+                self.run(source)
 
-        except KeyboardInterrupt:
-            break
+            except (KeyboardInterrupt, EOFError):
+                break
 
-def run_file(filename):
-    with open(filename, "r") as file:
-        source = file.read()
+    def run_file(self, filename):
+        with open(filename, "r") as file:
+            source = file.read()
 
-    print("Scanner Not Implemented")
+        self.run(source)
 
+    def run(self, source):
+        scanner = Scanner(source)
+        tokens = scanner.scan()
 
+        for token in tokens:
+            token.print_token()
 
-if len(sys.argv) == 1:
-    repl()
-elif len(sys.argv) == 2:
-    run_file(sys.argv[1])
-else:
-    print("Too many files, try: lox.py [filename].lox")
+if __name__ == "__main__":
+    lox = Lox()
+    if len(sys.argv) == 1:
+        lox.repl()
+    elif len(sys.argv) == 2:
+        lox.run_file(sys.argv[1])
+    else:
+        print("Too many files, try: lox.py [filename].lox")
 
 
 
