@@ -19,7 +19,7 @@ class Scanner:
             "-": TokenType.MINUS,
             "+": TokenType.PLUS,
             ";": TokenType.SEMICOLON,
-            "/": TokenType.SLASH,
+
             "*": TokenType.STAR,
         }
 
@@ -125,6 +125,7 @@ class Scanner:
             self.next()
 
         if self.end():
+            self.had_error = True
             print(self.start_line, "bad string")
             return
 

@@ -1,7 +1,7 @@
 import sys
 from scanner import Scanner
 
-class Lox:
+class Spaghetti:
     def repl(self):
         print("REPL mode")
         while True:
@@ -26,13 +26,13 @@ class Lox:
             token.print_token()
 
 if __name__ == "__main__":
-    lox = Lox()
+    spaghetti = Spaghetti()
     if len(sys.argv) == 1:
-        lox.repl()
+        spaghetti.repl()
     elif len(sys.argv) == 2:
-        lox.run_file(sys.argv[1])
+        spaghetti.run_file(sys.argv[1])
     else:
-        print("Too many files, try: lox.py [filename].lox")
+        print("Too many files, try: spaghetti.py [filename].spaghetti")
 
 
 
