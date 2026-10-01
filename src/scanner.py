@@ -126,7 +126,7 @@ class Scanner:
 
         if self.end():
             self.had_error = True
-            print(self.start_line, "bad string")
+            print( "line", self.start_line, "has a bad string")
             return
 
         # go past end quote

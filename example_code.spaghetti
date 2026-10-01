@@ -1,6 +1,9 @@
 var score = 12.5;
-print "Hello";
+print "Hello;
+
 
 if (score >= 10 and score != 0) {
     print true;
 }
+
+
