@@ -1,5 +1,6 @@
 import sys
 from scanner import Scanner
+from parser import Parser
 
 class Spaghetti:
     def repl(self):
@@ -22,8 +23,13 @@ class Spaghetti:
         scanner = Scanner(source)
         tokens = scanner.scan()
 
-        for token in tokens:
-            token.print_token()
+        if scanner.had_error:
+            return
+        try:
+            tree = Parser(tokens).parse()
+            print(tree)
+        except SyntaxError as error:
+            print(error)
 
 if __name__ == "__main__":
     spaghetti = Spaghetti()
