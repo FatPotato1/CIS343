@@ -1,6 +1,7 @@
 import sys
 from scanner import Scanner
 from parser import Parser
+from evaluator import Evaluator
 
 class Spaghetti:
     def repl(self):
@@ -25,10 +26,14 @@ class Spaghetti:
 
         if scanner.had_error:
             return
+
         try:
             tree = Parser(tokens).parse()
             print(tree)
-        except SyntaxError as error:
+           #evaluator part for the midterm
+            result = Evaluator().evaluate(tree)
+            print(str(result).lower())
+        except (SyntaxError, TypeError, ZeroDivisionError) as error:
             print(error)
 
 if __name__ == "__main__":
