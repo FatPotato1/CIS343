@@ -32,3 +32,12 @@ class Expression:
 
         def __str__(self):
             return f"(group {self.expression})"
+
+class Statement:
+    class Expression:
+        def __init__(self, expression):
+            self.expression = expression
+
+    class Print:
+        def __init__(self, expression):
+            self.expression = expression

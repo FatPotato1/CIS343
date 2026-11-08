@@ -1,4 +1,4 @@
-from grammar import Expression
+from grammar import Expression, Statement
 from tokens import TokenType
 
 
@@ -39,6 +39,42 @@ class Parser:
             )
 
         return tree
+
+    def parse_program(self):
+        statements = []
+        errors = []
+
+        while self.peek().type != TokenType.EOF:
+            try:
+                statements.append(self.statement())
+            except SyntaxError as error:
+                errors.append(error)
+                self.synchronize()
+
+        return statements, errors
+
+    def statement(self):
+        if self.peek().type == TokenType.PRINT:
+            self.expect(TokenType.PRINT)
+            expression = self.expression()
+            self.expect(TokenType.SEMICOLON)
+            return Statement.Print(expression)
+
+        expression = self.expression()
+        self.expect(TokenType.SEMICOLON)
+        return Statement.Expression(expression)
+
+    def synchronize(self):
+        while self.peek().type != TokenType.EOF:
+            token_type = self.peek().type
+
+            if token_type == TokenType.PRINT:
+                return
+
+            self.expect(token_type)
+
+            if token_type == TokenType.SEMICOLON:
+                return
 
     def expression(self):
         return self.equality()

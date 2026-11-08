@@ -1,7 +1,28 @@
-from grammar import Expression
+from grammar import Expression, Statement
+
 
 
 class Evaluator:
+
+    def execute(self, statement):
+        value = self.evaluate(statement.expression)
+
+        if isinstance(statement, Statement.Print):
+            print(self.stringify(value))
+
+    # used AI on some of this part
+    # --- start AI code ---
+    def stringify(self, value):
+        if value is None:
+            return "nil"
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, float) and value.is_integer():
+            return str(int(value))
+        return str(value)
+
+    # --- end AI code ---
+
     def evaluate(self, node):
         if isinstance(node, Expression.Literal):
             return node.value

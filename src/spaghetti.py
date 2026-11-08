@@ -23,17 +23,20 @@ class Spaghetti:
     def run(self, source):
         scanner = Scanner(source)
         tokens = scanner.scan()
-
         if scanner.had_error:
             return
 
+        statements, errors = Parser(tokens).parse_program()
+        if errors:
+            for error in errors:
+                print(error)
+            return
+
+        evaluator = Evaluator()
         try:
-            tree = Parser(tokens).parse()
-            print(tree)
-           #evaluator part for the midterm
-            result = Evaluator().evaluate(tree)
-            print(str(result).lower())
-        except (SyntaxError, TypeError, ZeroDivisionError) as error:
+            for statement in statements:
+                evaluator.execute(statement)
+        except (TypeError, ZeroDivisionError) as error:
             print(error)
 
 if __name__ == "__main__":
