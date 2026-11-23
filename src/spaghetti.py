@@ -2,8 +2,14 @@ import sys
 from scanner import Scanner
 from parser import Parser
 from evaluator import Evaluator
+from environment import SpaghettiRuntimeError
+
 
 class Spaghetti:
+
+    def __init__(self):
+        self.evaluator = Evaluator()
+
     def repl(self):
         print("REPL mode")
         while True:
@@ -32,11 +38,11 @@ class Spaghetti:
                 print(error)
             return
 
-        evaluator = Evaluator()
         try:
             for statement in statements:
-                evaluator.execute(statement)
-        except (TypeError, ZeroDivisionError) as error:
+                self.evaluator.execute(statement)
+
+        except (SpaghettiRuntimeError, TypeError, ZeroDivisionError) as error:
             print(error)
 
 if __name__ == "__main__":

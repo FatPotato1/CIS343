@@ -33,6 +33,21 @@ class Expression:
         def __str__(self):
             return f"(group {self.expression})"
 
+    class Variable:
+        def __init__(self, name):
+            self.name = name
+
+        def __str__(self):
+            return self.name.lexeme
+
+    class Assign:
+        def __init__(self, name, value):
+            self.name = name
+            self.value = value
+
+        def __str__(self):
+            return f"(= {self.name.lexeme} {self.value})"
+
 class Statement:
     class Expression:
         def __init__(self, expression):
@@ -41,3 +56,12 @@ class Statement:
     class Print:
         def __init__(self, expression):
             self.expression = expression
+
+    class Var:
+        def __init__(self, name, initializer):
+            self.name = name
+            self.initializer = initializer
+
+    class Block:
+        def __init__(self, statements):
+            self.statements = statements

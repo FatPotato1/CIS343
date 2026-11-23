@@ -1,14 +1,47 @@
 from grammar import Expression, Statement
-
+from environment import Environment
 
 
 class Evaluator:
 
+    #used ai on a few parts of this
+    # --- start AI code ---
+    def __init__(self):
+        self.environment = Environment()
+
     def execute(self, statement):
-        value = self.evaluate(statement.expression)
+        if isinstance(statement, Statement.Var):
+            value = None
+            if statement.initializer is not None:
+                value = self.evaluate(statement.initializer)
+
+            self.environment.define(statement.name.lexeme, value)
+            return
+
+        if isinstance(statement, Statement.Block):
+            self.execute_block(statement.statements, Environment(self.environment))
+            return
 
         if isinstance(statement, Statement.Print):
+            value = self.evaluate(statement.expression)
             print(self.stringify(value))
+            return
+
+        if isinstance(statement, Statement.Expression):
+            self.evaluate(statement.expression)
+    # --- end AI code ---
+
+    def execute_block(self, statements, environment):
+        previous = self.environment
+
+        try:
+            self.environment = environment
+
+            for statement in statements:
+                self.execute(statement)
+
+        finally:
+            self.environment = previous
 
     # used AI on some of this part
     # --- start AI code ---
@@ -24,6 +57,14 @@ class Evaluator:
     # --- end AI code ---
 
     def evaluate(self, node):
+
+        if isinstance(node, Expression.Variable):
+            return self.environment.get(node.name)
+
+        if isinstance(node, Expression.Assign):
+            value = self.evaluate(node.value)
+            return self.environment.assign(node.name, value)
+
         if isinstance(node, Expression.Literal):
             return node.value
 

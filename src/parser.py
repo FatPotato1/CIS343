@@ -42,16 +42,38 @@ class Parser:
 
     def parse_program(self):
         statements = []
-        errors = []
+        self.errors = []
 
         while self.peek().type != TokenType.EOF:
-            try:
-                statements.append(self.statement())
-            except SyntaxError as error:
-                errors.append(error)
-                self.synchronize()
+            statement = self.declaration()
+            if statement is not None:
+                statements.append(statement)
 
-        return statements, errors
+        return statements, self.errors
+
+    def declaration(self):
+        try:
+            if self.peek().type == TokenType.VAR:
+                return self.var_declaration()
+
+            return self.statement()
+
+        except SyntaxError as error:
+            self.errors.append(error)
+            self.synchronize()
+            return None
+
+    def var_declaration(self):
+        self.expect(TokenType.VAR)
+        name = self.expect(TokenType.IDENTIFIER)
+
+        initializer = None
+        if self.peek().type == TokenType.EQUAL:
+            self.expect(TokenType.EQUAL)
+            initializer = self.expression()
+
+        self.expect(TokenType.SEMICOLON)
+        return Statement.Var(name, initializer)
 
     def statement(self):
         if self.peek().type == TokenType.PRINT:
@@ -60,15 +82,40 @@ class Parser:
             self.expect(TokenType.SEMICOLON)
             return Statement.Print(expression)
 
+        if self.peek().type == TokenType.LEFT_BRACE:
+            self.expect(TokenType.LEFT_BRACE)
+            return Statement.Block(self.block())
+
+        if self.peek().type == TokenType.RIGHT_BRACE:
+            token = self.expect(TokenType.RIGHT_BRACE)
+            raise SyntaxError(
+                f"[line {token.line}] Unmatched '}}'."
+            )
+
         expression = self.expression()
         self.expect(TokenType.SEMICOLON)
         return Statement.Expression(expression)
+
+    def block(self):
+        statements = []
+
+        while self.peek().type not in (TokenType.RIGHT_BRACE, TokenType.EOF):
+            statement = self.declaration()
+            if statement is not None:
+                statements.append(statement)
+
+        if self.peek().type == TokenType.EOF:
+            token = self.peek()
+            raise SyntaxError(f"[line {token.line}] Expect '}}' after block.")
+
+        self.expect(TokenType.RIGHT_BRACE)
+        return statements
 
     def synchronize(self):
         while self.peek().type != TokenType.EOF:
             token_type = self.peek().type
 
-            if token_type == TokenType.PRINT:
+            if token_type in (TokenType.VAR, TokenType.PRINT, TokenType.LEFT_BRACE, TokenType.RIGHT_BRACE, ):
                 return
 
             self.expect(token_type)
@@ -77,7 +124,23 @@ class Parser:
                 return
 
     def expression(self):
-        return self.equality()
+        return self.assignment()
+
+    def assignment(self):
+        tree = self.equality()
+
+        if self.peek().type == TokenType.EQUAL:
+            equals = self.expect(TokenType.EQUAL)
+            value = self.assignment()
+
+            if isinstance(tree, Expression.Variable):
+                return Expression.Assign(tree.name, value)
+
+            raise SyntaxError(
+                f"[line {equals.line}] Invalid assignment target."
+            )
+
+        return tree
 
     def equality(self):
         # != and ==
@@ -146,6 +209,11 @@ class Parser:
             self.expect(TokenType.RIGHT_PAREN)
             return Expression.Group(tree)
 
+        if token.type == TokenType.IDENTIFIER:
+            self.expect(TokenType.IDENTIFIER)
+            return Expression.Variable(token)
+
         raise SyntaxError(
-            f"[line {token.line}] Expected a literal or '(', " f"got {token.type.name} ({token.lexeme!r})")
+            f"[line {token.line}] Expected a literal, identifier, "
+            f"or '(', got {token.type.name} ({token.lexeme!r})")
     # --- end AI code --
